@@ -9,8 +9,8 @@ import {
 
 export const domEnv = typeof window != 'undefined';
 
-export const doc = domEnv ? document  : null;
-export const win = domEnv ? window    : null;
+export const doc = domEnv ? document : null;
+export const win = domEnv ? window : null;
 export const nav = domEnv ? navigator : null;
 
 export let pxRatio;
@@ -28,7 +28,9 @@ function setPxRatio() {
 
 		query && off(change, query, setPxRatio);
 		query = matchMedia(`(min-resolution: ${pxRatio - 0.001}dppx) and (max-resolution: ${pxRatio + 0.001}dppx)`);
-		on(change, query, setPxRatio);
+		if (query.addEventListener) { // make sure event listeners are supported on matchMedia() (unsupported on Safari < 15)
+			on(change, query, setPxRatio);
+		}
 
 		win.dispatchEvent(new CustomEvent(dppxchange));
 	}
@@ -106,13 +108,13 @@ export function elSize(el, newWid, newHgt, centered) {
 		sizeCache.set(el, newSize);
 		el.style.height = newHgt + "px";
 		el.style.width = newWid + "px";
-		el.style.marginLeft = centered ? -newWid/2 + "px" : 0;
-		el.style.marginTop = centered ? -newHgt/2 + "px" : 0;
+		el.style.marginLeft = centered ? -newWid / 2 + "px" : 0;
+		el.style.marginTop = centered ? -newHgt / 2 + "px" : 0;
 	}
 }
 
-const evOpts = {passive: true};
-const evOpts2 = {...evOpts, capture: true};
+const evOpts = { passive: true };
+const evOpts2 = { ...evOpts, capture: true };
 
 export function on(ev, el, cb, capt) {
 	el.addEventListener(ev, cb, capt ? evOpts2 : evOpts);
